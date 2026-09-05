@@ -1,5 +1,5 @@
 :root {
-  --paper: #f1eee6;
+  --paper: #e8e5df;
   --paper-raised: rgba(248, 246, 240, 0.86);
   --ink: #171a1b;
   --muted-ink: #5f625d;
@@ -126,6 +126,14 @@ main,
   width: min(calc(100% - (2 * var(--gutter))), var(--content-width));
   min-height: var(--header-height);
   margin-inline: auto;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.header-marks {
+  display: flex;
+  align-items: center;
+  gap: 0.72rem;
 }
 
 .site-mark {
@@ -136,10 +144,63 @@ main,
   border: 1px solid var(--line-strong);
   border-radius: 50%;
   background: rgba(241, 238, 230, 0.58);
-  font-family: var(--serif);
-  font-size: 0.75rem;
-  letter-spacing: 0.08em;
   text-decoration: none;
+  transition:
+    border-color 180ms ease,
+    background-color 180ms ease,
+    transform 180ms ease;
+}
+
+.site-mark:hover {
+  border-color: var(--oxide);
+  background: var(--paper-raised);
+  transform: rotate(-3deg);
+}
+
+.penrose-mark {
+  width: 1.72rem;
+  height: 1.72rem;
+  overflow: visible;
+}
+
+.penrose-face-a {
+  fill: var(--oxide);
+}
+
+.penrose-face-b {
+  fill: var(--ink);
+  opacity: 0.78;
+}
+
+.penrose-face-c {
+  fill: var(--sage-dark);
+  opacity: 0.86;
+}
+
+.penrose-cut {
+  fill: var(--paper);
+}
+
+.header-philpeople-link {
+  display: grid;
+  height: 2.75rem;
+  padding-left: 0.72rem;
+  border-left: 1px solid var(--line);
+  place-items: center;
+  opacity: 0.68;
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease;
+}
+
+.header-philpeople-link:hover {
+  opacity: 1;
+  transform: translateY(-1px);
+}
+
+.header-philpeople-link img {
+  width: auto;
+  height: 2.25rem;
 }
 
 .page-section {
@@ -194,7 +255,7 @@ main,
   max-width: 38rem;
   margin: clamp(1.8rem, 4vh, 3rem) 0 0;
   font-family: var(--serif);
-  font-size: clamp(1.08rem, 1.55vw, 1.34rem);
+  font-size: clamp(1.1rem, 1.4vw, 1.2rem);
   line-height: 1.55;
 }
 
@@ -220,60 +281,55 @@ main,
 }
 
 .hero-actions {
-  display: grid;
-  max-width: 44rem;
+  display: flex;
+  width: fit-content;
+  max-width: 100%;
   margin-top: clamp(1.75rem, 4vh, 2.75rem);
-  border-top: 1px solid var(--line-strong);
-  border-bottom: 1px solid var(--line-strong);
-  grid-template-columns: repeat(3, 1fr);
+  flex-wrap: wrap;
+  gap: 0.6rem;
 }
 
 .hero-actions a {
-  display: grid;
-  min-height: 6.5rem;
-  padding: 1rem 1.1rem;
-  background: rgba(241, 238, 230, 0.5);
-  grid-template-columns: 1fr auto;
-  grid-template-rows: auto 1fr;
-  gap: 0.45rem 1rem;
+  display: inline-flex;
+  min-height: 0;
+  padding: 0.68rem 0.88rem;
+  border: 1px solid var(--line-strong);
+  background: rgba(241, 238, 230, 0.62);
+  align-items: center;
+  gap: 0.65rem;
   text-decoration: none;
   transition:
     color 180ms ease,
-    background-color 180ms ease;
+    background-color 180ms ease,
+    border-color 180ms ease;
 }
 
 .hero-actions a + a {
   border-left: 1px solid var(--line-strong);
 }
 
-.hero-actions a > span:first-child {
-  color: var(--oxide);
-  font-size: 0.65rem;
-  font-weight: 750;
-  letter-spacing: 0.08em;
-}
-
 .hero-actions a > span:last-child {
-  grid-column: 2;
-  grid-row: 1 / 3;
-  align-self: end;
-  font-size: 1rem;
+  color: var(--oxide);
+  font-size: 0.82rem;
+  line-height: 1;
   transition: transform 180ms ease;
 }
 
 .hero-actions strong {
-  align-self: end;
-  font-family: var(--serif);
-  font-size: clamp(1.05rem, 1.6vw, 1.3rem);
-  font-weight: 500;
+  font-family: var(--sans);
+  font-size: 0.82rem;
+  font-weight: 650;
+  letter-spacing: 0.015em;
 }
 
 .hero-actions a:hover {
   color: var(--paper);
+  border-color: var(--ink);
   background: var(--ink);
 }
 
 .hero-actions a:hover > span:last-child {
+  color: currentColor;
   transform: translate(0.15rem, 0.15rem);
 }
 
@@ -429,15 +485,17 @@ main,
   display: flex;
   margin-bottom: 0.55rem;
   color: var(--muted-ink);
-  font-size: 0.66rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  gap: 1rem;
+  font-family: var(--serif);
+  font-size: 0.875rem;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  text-transform: none;
+  gap: 0.75rem;
 }
 
 .work-meta span + span::before {
-  margin-right: 1rem;
+  margin-right: 0.75rem;
   color: var(--oxide);
   content: "/";
 }
@@ -621,7 +679,7 @@ main,
   padding-block: 2.5rem;
   border-top: 1px solid var(--line-strong);
   color: var(--muted-ink);
-  grid-template-columns: 1fr auto auto auto;
+  grid-template-columns: 1fr auto auto;
   align-items: end;
   gap: 2rem;
   font-size: 0.72rem;
@@ -651,31 +709,6 @@ main,
     font-size: clamp(3rem, 7vw, 5rem);
   }
 
-  .hero-actions {
-    grid-template-columns: 1fr;
-  }
-
-  .hero-actions a {
-    min-height: 4.5rem;
-    grid-template-columns: 2rem 1fr auto;
-    grid-template-rows: 1fr;
-    align-items: center;
-  }
-
-  .hero-actions a + a {
-    border-top: 1px solid var(--line-strong);
-    border-left: 0;
-  }
-
-  .hero-actions a > span:last-child {
-    grid-column: 3;
-    grid-row: 1;
-    align-self: center;
-  }
-
-  .hero-actions strong {
-    align-self: center;
-  }
 }
 
 @media (max-width: 760px) {
@@ -710,6 +743,11 @@ main,
 
   .hero-actions {
     width: 100%;
+  }
+
+  .hero-actions a {
+    flex: 1 1 8rem;
+    justify-content: center;
   }
 
   .content-section {
@@ -878,22 +916,6 @@ main,
 .work-copy > .work-description {
   margin-top: 0.7rem;
 }
-.philpeople-link {
-  display: inline-flex;
-  align-items: center;
-  opacity: 0.7;
-  transition: opacity 180ms ease;
-}
-
-.philpeople-link:hover {
-  opacity: 1;
-}
-
-.philpeople-link img {
-  width: 5.5rem;
-  height: auto;
-}
-
 .hero h1 {
   color: var(--ink);
   font-family: var(--serif);
@@ -913,5 +935,51 @@ main,
 @media (max-width: 760px) {
   .hero h1 {
     font-size: clamp(2.5rem, 11vw, 4rem);
+  }
+}
+
+.header-nav {
+  display: flex;
+  margin-left: auto;
+  align-items: center;
+  gap: 1.4rem;
+}
+
+.header-nav a {
+  position: relative;
+  padding: 0.75rem 0;
+  color: var(--oxide);
+  font-size: 1rem;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+}
+
+.header-nav a::after {
+  position: absolute;
+  right: 0;
+  bottom: 0.5rem;
+  left: 0;
+  height: 1px;
+  background: var(--oxide);
+  content: "";
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 180ms ease;
+}
+
+.header-nav a:hover::after,
+.header-nav a:focus-visible::after {
+  transform: scaleX(1);
+}
+
+@media (max-width: 560px) {
+  .header-nav {
+    gap: 0.65rem;
+  }
+
+  .header-nav a {
+    font-size: 0.7rem;
+    letter-spacing: 0;
   }
 }

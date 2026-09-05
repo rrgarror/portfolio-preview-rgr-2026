@@ -3,7 +3,6 @@
 const canvas = document.querySelector("#visual-canvas");
 const siteHeader = document.querySelector(".site-header");
 const researchSection = document.querySelector("#research");
-const teachingSection = document.querySelector("#teaching");
 
 const clamp = (value, minimum = 0, maximum = 1) =>
   Math.min(maximum, Math.max(minimum, value));
@@ -14,15 +13,29 @@ const smoothstep = (start, end, value) => {
 };
 
 function getVisualProgress() {
-  const researchTop = researchSection?.offsetTop ?? window.innerHeight;
-  const teachingTop = teachingSection?.offsetTop ?? researchTop * 2;
+  const pageEnd = Math.max(
+    document.documentElement.scrollHeight - window.innerHeight,
+    1,
+  );
+  const researchEnd = researchSection
+    ? researchSection.offsetTop + researchSection.offsetHeight
+    : pageEnd * 0.5;
+  const researchEndScroll = clamp(
+    researchEnd - window.innerHeight,
+    1,
+    Math.max(pageEnd - 1, 1),
+  );
+  const currentScroll = clamp(window.scrollY, 0, pageEnd);
 
-  if (window.scrollY <= researchTop) {
-    return 0.5 * clamp(window.scrollY / Math.max(researchTop, 1));
+  // The wireframe is reached only as Research finishes entering the
+  // viewport. The junction vocabulary is reached only at the page end.
+  if (currentScroll <= researchEndScroll) {
+    return 0.5 * clamp(currentScroll / researchEndScroll);
   }
 
   return 0.5 + 0.5 * clamp(
-    (window.scrollY - researchTop) / Math.max(teachingTop - researchTop, 1),
+    (currentScroll - researchEndScroll) /
+      Math.max(pageEnd - researchEndScroll, 1),
   );
 }
 
@@ -88,64 +101,79 @@ if (canvas) {
     }
   }
 
-  const targetSegments = [
-    [0.18, 0.18, 0.08, 0.08],
-    [0.18, 0.18, 0.28, 0.08],
-    [0.18, 0.18, 0.18, 0.31],
-    [0.38, 0.12, 0.62, 0.12],
-    [0.50, 0.12, 0.50, 0.28],
-    [0.50, 0.12, 0.50, 0.04],
-    [0.82, 0.18, 0.70, 0.08],
-    [0.82, 0.18, 0.94, 0.08],
-    [0.82, 0.18, 0.82, 0.31],
-    [0.18, 0.48, 0.18, 0.35],
-    [0.18, 0.48, 0.31, 0.48],
-    [0.40, 0.38, 0.47, 0.50],
-    [0.47, 0.50, 0.54, 0.38],
-    [0.54, 0.38, 0.61, 0.50],
-    [0.61, 0.50, 0.68, 0.38],
-    [0.84, 0.46, 0.74, 0.36],
-    [0.84, 0.46, 0.94, 0.36],
-    [0.84, 0.46, 0.74, 0.56],
-    [0.84, 0.46, 0.94, 0.56],
-    [0.07, 0.70, 0.30, 0.70],
-    [0.07, 0.76, 0.30, 0.76],
-    [0.07, 0.82, 0.30, 0.82],
-    [0.43, 0.68, 0.61, 0.68],
-    [0.61, 0.68, 0.61, 0.84],
-    [0.61, 0.84, 0.43, 0.84],
-    [0.43, 0.84, 0.43, 0.68],
-    [0.76, 0.68, 0.84, 0.82],
-    [0.84, 0.82, 0.92, 0.68],
-    [0.78, 0.90, 0.94, 0.90],
-    [0.70, 0.64, 0.70, 0.90],
+  // Canonical line-junction vocabulary adapted from the supplied figures.
+  // The shared centers sit on an exact three-column by two-row grid.
+  const junctionPrimitives = [
+    {
+      name: "fork",
+      center: [0.18, 0.34],
+      rays: [
+        [0, -0.105],
+        [-0.08, 0.08],
+        [0.08, 0.08],
+      ],
+    },
+    {
+      name: "arrow",
+      center: [0.5, 0.34],
+      rays: [
+        [-0.085, -0.025],
+        [-0.055, 0.075],
+        [0.04, -0.115],
+      ],
+    },
+    {
+      name: "ell",
+      center: [0.82, 0.34],
+      rays: [
+        [-0.05, -0.1],
+        [0.09, 0],
+      ],
+    },
+    {
+      name: "psi",
+      center: [0.18, 0.66],
+      rays: [
+        [0, -0.12],
+        [-0.075, -0.075],
+        [0.075, -0.075],
+        [0, 0.105],
+      ],
+    },
+    {
+      name: "tee",
+      center: [0.5, 0.66],
+      rays: [
+        [-0.09, 0],
+        [0.09, 0],
+        [0, 0.11],
+      ],
+    },
+    {
+      name: "peak",
+      center: [0.82, 0.66],
+      rays: [
+        [-0.08, 0.08],
+        [0.08, 0.08],
+        [0, 0.12],
+      ],
+    },
   ];
 
-  const dashedSegmentIndices = new Set([5, 17, 25, 29]);
-  const arrowSegmentIndices = new Set([3, 6, 7, 18]);
-  const junctionPoints = [
-    [0.18, 0.18],
-    [0.50, 0.12],
-    [0.82, 0.18],
-    [0.18, 0.48],
-    [0.47, 0.50],
-    [0.54, 0.38],
-    [0.61, 0.50],
-    [0.84, 0.46],
-    [0.84, 0.82],
-  ];
-
-  const lineLabels = [
-    [0.12, 0.13, "+"],
-    [0.55, 0.11, "−"],
-    [0.80, 0.26, "+"],
-    [0.23, 0.75, "−"],
-  ];
+  const targetSegments = junctionPrimitives.flatMap(({ center, rays }) =>
+    rays.map(([offsetX, offsetY]) => [
+      center[0],
+      center[1],
+      center[0] + offsetX,
+      center[1] + offsetY,
+    ]),
+  );
 
   function resizeCanvas() {
     width = window.innerWidth;
     height = window.innerHeight;
     pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+    targetProgress = getVisualProgress();
 
     canvas.width = Math.round(width * pixelRatio);
     canvas.height = Math.round(height * pixelRatio);
@@ -196,9 +224,9 @@ if (canvas) {
 
   function getTargetPoint(x, y) {
     const regionLeft = width < 900 ? width * 0.1 : width * 0.57;
-    const regionTop = height * 0.08;
     const regionWidth = width < 900 ? width * 0.8 : width * 0.38;
-    const regionHeight = height * 0.82;
+    const regionHeight = Math.min(regionWidth * 0.78, height * 0.58);
+    const regionTop = (height - regionHeight) * 0.5;
 
     return {
       x: regionLeft + x * regionWidth,
@@ -296,91 +324,40 @@ if (canvas) {
     context.restore();
   }
 
-  function drawArrowhead(first, second, opacity) {
-    const amount = 0.56;
-    const x = first.x + (second.x - first.x) * amount;
-    const y = first.y + (second.y - first.y) * amount;
-    const angle = Math.atan2(second.y - first.y, second.x - first.x);
-    const size = 4.5;
-
-    context.save();
-    context.globalAlpha = opacity;
-    context.fillStyle = "rgb(138, 71, 55)";
-    context.translate(x, y);
-    context.rotate(angle);
-    context.beginPath();
-    context.moveTo(size, 0);
-    context.lineTo(-size, -size * 0.55);
-    context.lineTo(-size, size * 0.55);
-    context.closePath();
-    context.fill();
-    context.restore();
-  }
-
-  function drawPrimitiveAnnotations(opacity) {
-    if (opacity <= 0.002) {
-      return;
-    }
-
-    context.save();
-    context.globalAlpha = opacity;
-    context.strokeStyle = "rgba(35, 40, 37, 0.52)";
-    context.fillStyle = "rgba(241, 238, 230, 0.92)";
-    context.lineWidth = 0.8;
-
-    junctionPoints.forEach(([x, y]) => {
-      const point = getTargetPoint(x, y);
-      context.beginPath();
-      context.arc(point.x, point.y, 2.7, 0, Math.PI * 2);
-      context.fill();
-      context.stroke();
-    });
-
-    context.fillStyle = "rgba(138, 71, 55, 0.72)";
-    context.font = '11px ui-sans-serif, "Segoe UI", sans-serif';
-    context.textAlign = "center";
-    context.textBaseline = "middle";
-
-    lineLabels.forEach(([x, y, label]) => {
-      const point = getTargetPoint(x, y);
-      context.fillText(label, point.x, point.y);
-    });
-
-    context.restore();
-  }
-
   function drawMorph(progress) {
     const { points, centerX, centerY, scale } = getProjectedObject(progress);
-    const faceOpacity = 1 - smoothstep(0.08, 0.46, progress);
-    const segmentMorph = smoothstep(0.53, 0.98, progress);
-    const wireframeReveal = smoothstep(0.15, 0.49, progress);
-    const annotationOpacity = smoothstep(0.68, 0.98, progress);
+    const faceOpacity = 1 - smoothstep(0.04, 0.5, progress);
+    const segmentMorph = smoothstep(0.5, 1, progress);
+    const wireframeReveal = smoothstep(0.15, 0.5, progress);
 
     drawSolidFaces(points, faceOpacity);
 
     context.save();
     context.lineCap = "round";
+    context.setLineDash([]);
 
     objectEdges.forEach(([firstIndex, secondIndex], edgeIndex) => {
       const target = getTargetSegment(edgeIndex);
       const first = mixPoint(points[firstIndex], target.first, segmentMorph);
       const second = mixPoint(points[secondIndex], target.second, segmentMorph);
       const depth = clamp((points[firstIndex].z + points[secondIndex].z + 5) / 10, 0.34, 1);
-      const lineOpacity = (0.17 + depth * 0.18) * Math.max(wireframeReveal, segmentMorph);
+      const retainedAtTarget =
+        edgeIndex < targetSegments.length ? 1 : 1 - segmentMorph;
+      const lineOpacity =
+        (0.17 + depth * 0.18) *
+        Math.max(wireframeReveal, segmentMorph) *
+        retainedAtTarget;
+
+      if (lineOpacity <= 0.002) {
+        return;
+      }
 
       context.lineWidth = 0.75 + segmentMorph * 0.3;
       context.strokeStyle = `rgba(35, 40, 37, ${lineOpacity})`;
-      context.setLineDash(
-        segmentMorph > 0.72 && dashedSegmentIndices.has(edgeIndex) ? [3, 5] : [],
-      );
       context.beginPath();
       context.moveTo(first.x, first.y);
       context.lineTo(second.x, second.y);
       context.stroke();
-
-      if (arrowSegmentIndices.has(edgeIndex)) {
-        drawArrowhead(first, second, annotationOpacity * 0.72);
-      }
     });
 
     if (segmentMorph < 0.55) {
@@ -402,7 +379,6 @@ if (canvas) {
     }
 
     context.restore();
-    drawPrimitiveAnnotations(annotationOpacity);
   }
 
   function renderFrame() {
